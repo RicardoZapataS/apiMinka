@@ -3,10 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Categoria;
+use App\Http\Requests\CreateCategoriaRequest;
 use Illuminate\Http\Request;
 
 class CategoriaController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -14,17 +22,8 @@ class CategoriaController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $categorias = Categoria::all();
+        return response()->json(['dato' => $categorias, 'exito' => true], 200);
     }
 
     /**
@@ -33,9 +32,16 @@ class CategoriaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateCategoriaRequest $request)
     {
-        //
+        $categorias = new Categoria;
+        $categorias->nombre = $request->nombre;
+        $categorias->descripcion = $request->descripcion;
+        $categorias->estado = $request->estado;
+        $categorias->habilidad_id = $request->habilidad_id;
+        $categorias->trabajo_id = $request->trabajo_id;
+        $salida = $categorias->save();        
+        return response()->json(['dato' => $categorias, 'exito' => $salida], 200);
     }
 
     /**
@@ -44,21 +50,15 @@ class CategoriaController extends Controller
      * @param  \App\Categoria  $categoria
      * @return \Illuminate\Http\Response
      */
-    public function show(Categoria $categoria)
+    public function show($id)
     {
-        //
+        $categoria = Categoria::find($id);
+        if($categoria !== null)
+            return response()->json(['dato' => $categoria, 'exito' => true], 201);
+        else
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Categoria  $categoria
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Categoria $categoria)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -67,9 +67,15 @@ class CategoriaController extends Controller
      * @param  \App\Categoria  $categoria
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Categoria $categoria)
+    public function update(CreateCategoriaRequest $request, $id)
     {
-        //
+        $categoria = Categoria::find($id);
+        if($categoria !== null){
+            $salida = $categoria->update($request->all());
+            return response()->json(['dato' => $categoria, 'exito' => $salida], 200);
+        } else{
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
+        }
     }
 
     /**
@@ -78,8 +84,15 @@ class CategoriaController extends Controller
      * @param  \App\Categoria  $categoria
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Categoria $categoria)
+    public function destroy($id)
     {
-        //
+        $categoria= Categoria::find($id);  
+        if($categoria !== null){
+            $salida = $categoria->delete();
+            return response()->json(['dato' => $categoria, 'exito' => $salida], 200);
+        }else{
+            return response()->json(['Error'=> 'No eliminado', 'exito' => false], 400);
+        }
+        
     }
 }

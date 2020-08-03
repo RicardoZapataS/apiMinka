@@ -15,7 +15,6 @@ class CreateTrabajoAsignadosTable extends Migration
     {
         Schema::create('trabajo_asignados', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('fecha_asignado');
             $table->integer('estado');
             $table->integer('trabajo_id');
             $table->integer('user_id');

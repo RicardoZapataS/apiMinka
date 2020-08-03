@@ -19,6 +19,13 @@ class AuthController extends Controller
         }
         return $this->respondWithToken($token, 200);
     }
+    public function register(){
+        $credenciales = request(['email','password']);
+        if(!$token = auth()->attempt($credenciales)){
+            return response()->json(['error'=>'Correo o contrasenha invalido'], 400);
+        }
+        return $this->respondWithToken($token, 200);
+    }
 
     private function respondWithToken($token){
         return response()->json([

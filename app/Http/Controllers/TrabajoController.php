@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 class TrabajoController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -14,18 +21,10 @@ class TrabajoController extends Controller
      */
     public function index()
     {
-        //
+        $trabajo = Trabajo::all();
+        return response()->json(['dato' => $trabajo, 'exito' => true], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -35,29 +34,32 @@ class TrabajoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $trabajo = new Trabajo;
+        $trabajo->nombre = $request->nombre;
+        $trabajo->descripcion = $request->descripcion;
+        $trabajo->importe_ofertado = $request->importe_ofertado;
+        $trabajo->tiempo_limite = $request->tiempo_limite;
+        $trabajo->fecha_limite = $request->fecha_limite;
+        $trabajo->estado = $request->estado;
+        $trabajo->habilidad_id = $request->habilidad_id;
+        $trabajo->categoria_id = $request->categoria_id;
+        $salida = $trabajo->save();
+        return response()->json(['dato' => $trabajo, 'exito' => $salida], 200);
     }
 
-    /**
+/**
      * Display the specified resource.
      *
-     * @param  \App\Trabajo  $trabajo
+     * @param  \App\Categoria  $categoria
      * @return \Illuminate\Http\Response
      */
-    public function show(Trabajo $trabajo)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Trabajo  $trabajo
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Trabajo $trabajo)
-    {
-        //
+        $trabajo = Trabajo::find($id);
+        if($trabajo !== null)
+            return response()->json(['dato' => $trabajo, 'exito' => true], 201);
+        else
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
     }
 
     /**
@@ -67,9 +69,15 @@ class TrabajoController extends Controller
      * @param  \App\Trabajo  $trabajo
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Trabajo $trabajo)
+    public function update(Request $request,  $id)
     {
-        //
+        $trabajo = Trabajo::find($id);
+        if($trabajo !== null){
+            $salida = $trabajo->update($request->all());
+            return response()->json(['dato' => $trabajo, 'exito' => $salida], 200);
+        } else{
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
+        }
     }
 
     /**
@@ -78,8 +86,14 @@ class TrabajoController extends Controller
      * @param  \App\Trabajo  $trabajo
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Trabajo $trabajo)
+    public function destroy($id)
     {
-        //
+        $trabajo= Trabajo::find($id);  
+        if($trabajo !== null){
+            $salida = $trabajo->delete();
+            return response()->json(['dato' => $trabajo, 'exito' => $salida], 200);
+        }else{
+            return response()->json(['Error'=> 'No eliminado', 'exito' => false], 400);
+        }
     }
 }

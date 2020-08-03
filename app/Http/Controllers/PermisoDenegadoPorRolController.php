@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreatePermisoDenegadoRequest;
 use App\PermisoDenegadoPorRol;
 use Illuminate\Http\Request;
 
 class PermisoDenegadoPorRolController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -14,18 +22,10 @@ class PermisoDenegadoPorRolController extends Controller
      */
     public function index()
     {
-        //
+        $permisoDenegadoPorRol = PermisoDenegadoPorRol::all();
+        return response()->json(['dato' => $permisoDenegadoPorRol, 'exito' => true], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -33,31 +33,28 @@ class PermisoDenegadoPorRolController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreatePermisoDenegadoRequest $request)
     {
-        //
+        $permisoDenegadoPorRol = new PermisoDenegadoPorRol;
+        $permisoDenegadoPorRol->rol_id = $request->rol_id;
+        $permisoDenegadoPorRol->permiso_id = $request->permiso_id;
+        $salida = $permisoDenegadoPorRol->save();
+        return response()->json(['dato' => $permisoDenegadoPorRol, 'exito' => $salida], 200);
     }
 
-    /**
+/**
      * Display the specified resource.
      *
-     * @param  \App\PermisoDenegadoPorRol  $permisoDenegadoPorRol
+     * @param  \App\Categoria  $categoria
      * @return \Illuminate\Http\Response
      */
-    public function show(PermisoDenegadoPorRol $permisoDenegadoPorRol)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\PermisoDenegadoPorRol  $permisoDenegadoPorRol
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(PermisoDenegadoPorRol $permisoDenegadoPorRol)
-    {
-        //
+        $permisoDenegadoPorRol = PermisoDenegadoPorRol::find($id);
+        if($permisoDenegadoPorRol !== null)
+            return response()->json(['dato' => $permisoDenegadoPorRol, 'exito' => true], 201);
+        else
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
     }
 
     /**
@@ -67,9 +64,15 @@ class PermisoDenegadoPorRolController extends Controller
      * @param  \App\PermisoDenegadoPorRol  $permisoDenegadoPorRol
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, PermisoDenegadoPorRol $permisoDenegadoPorRol)
+    public function update(CreatePermisoDenegadoRequest $request,  $id)
     {
-        //
+        $permisoDenegadoPorRol = PermisoDenegadoPorRol::find($id);
+        if($permisoDenegadoPorRol !== null){
+            $salida = $permisoDenegadoPorRol->update($request->all());
+            return response()->json(['dato' => $permisoDenegadoPorRol, 'exito' => $salida], 200);
+        } else{
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
+        }
     }
 
     /**
@@ -78,8 +81,14 @@ class PermisoDenegadoPorRolController extends Controller
      * @param  \App\PermisoDenegadoPorRol  $permisoDenegadoPorRol
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PermisoDenegadoPorRol $permisoDenegadoPorRol)
+    public function destroy($id)
     {
-        //
+        $permisoDenegadoPorRol= PermisoDenegadoPorRol::find($id);  
+        if($permisoDenegadoPorRol !== null){
+            $salida = $permisoDenegadoPorRol->delete();
+            return response()->json(['dato' => $permisoDenegadoPorRol, 'exito' => $salida], 200);
+        }else{
+            return response()->json(['Error'=> 'No eliminado', 'exito' => false], 400);
+        }
     }
 }

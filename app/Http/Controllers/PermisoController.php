@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreatePermisoRequest;
 use App\Permiso;
 use Illuminate\Http\Request;
 
 class PermisoController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -14,18 +22,10 @@ class PermisoController extends Controller
      */
     public function index()
     {
-        //
+        $permiso = Permiso::all();
+        return response()->json(['dato' => $permiso, 'exito' => true], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -33,31 +33,28 @@ class PermisoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreatePermisoRequest $request)
     {
-        //
+        $permiso = new Permiso;
+        $permiso->modulo = $request->modulo;
+        $permiso->descripcion = $request->descripcion;
+        $salida = $permiso->save();
+        return response()->json(['dato' => $permiso, 'exito' => $salida], 200);
     }
 
-    /**
+/**
      * Display the specified resource.
      *
-     * @param  \App\Permiso  $permiso
+     * @param  \App\Categoria  $categoria
      * @return \Illuminate\Http\Response
      */
-    public function show(Permiso $permiso)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Permiso  $permiso
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Permiso $permiso)
-    {
-        //
+        $permiso = Permiso::find($id);
+        if($permiso !== null)
+            return response()->json(['dato' => $permiso, 'exito' => true], 201);
+        else
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
     }
 
     /**
@@ -67,9 +64,15 @@ class PermisoController extends Controller
      * @param  \App\Permiso  $permiso
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Permiso $permiso)
+    public function update(CreatePermisoRequest $request,  $id)
     {
-        //
+        $permiso = Permiso::find($id);
+        if($permiso !== null){
+            $salida = $permiso->update($request->all());
+            return response()->json(['dato' => $permiso, 'exito' => $salida], 200);
+        } else{
+            return response()->json(['Error'=> 'No encontrado', 'exito' => false], 404);
+        }
     }
 
     /**
@@ -78,8 +81,14 @@ class PermisoController extends Controller
      * @param  \App\Permiso  $permiso
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Permiso $permiso)
+    public function destroy($id)
     {
-        //
+        $permiso= Permiso::find($id);  
+        if($permiso !== null){
+            $salida = $permiso->delete();
+            return response()->json(['dato' => $permiso, 'exito' => $salida], 200);
+        }else{
+            return response()->json(['Error'=> 'No eliminado', 'exito' => false], 400);
+        }
     }
 }

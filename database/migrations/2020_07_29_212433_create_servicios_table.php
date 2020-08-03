@@ -17,9 +17,8 @@ class CreateServiciosTable extends Migration
             $table->id();
             $table->string('nombre');
             $table->text('descripcion');
-            $table->integer('importe');
+            $table->float('importe');
             $table->string('tipo_servicio');
-            $table->dateTime('fecha_registro');
             $table->integer('estado');
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('categoria_id')->nullable();
